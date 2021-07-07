@@ -52,7 +52,7 @@ public class Neuron {
         return sum;
     }
 
-    public Connection getInputConnectionWith(Neuron neuron) {
+    public Connection getInputConnectionWith(Neuron neuron) throws NoSuchConnectionException {
 
         for (Connection connection : inputConnections) {
             if (connection.getNeuronFrom() == neuron)
@@ -62,7 +62,7 @@ public class Neuron {
         throw new NoSuchConnectionException("There is no connection from the given neuron");
     }
 
-    public Connection getOutputConnectionWith(Neuron neuron) {
+    public Connection getOutputConnectionWith(Neuron neuron) throws NoSuchConnectionException {
 
         for (Connection connection : outputConnections) {
             if (connection.getNeuronTo() == neuron)
@@ -70,5 +70,15 @@ public class Neuron {
         }
 
         throw new NoSuchConnectionException("There is no connection to the given neuron");
+    }
+
+    public void fixOutputConnectionWithNeuron(Neuron neuronTo, double weight){
+        Connection connection = getOutputConnectionWith(neuronTo);
+        connection.setWeight(weight);
+    }
+
+    public void fixInputConnectionWithNeuron(Neuron neuronFrom, double weight){
+        Connection connection = getInputConnectionWith(neuronFrom);
+        connection.setWeight(weight);
     }
 }

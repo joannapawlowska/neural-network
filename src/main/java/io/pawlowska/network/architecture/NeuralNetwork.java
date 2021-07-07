@@ -1,8 +1,12 @@
 package io.pawlowska.network.architecture;
 
+import io.pawlowska.network.data.DataSet;
 import io.pawlowska.network.data.Record;
 import io.pawlowska.network.exceptions.MissingLayerException;
 import io.pawlowska.network.exceptions.NoSuchLayerException;
+import io.pawlowska.network.functions.ActivationFunction;
+import io.pawlowska.network.functions.Bipolar;
+import io.pawlowska.network.training.Training;
 import io.pawlowska.network.utils.DecisionComparator;
 import io.pawlowska.network.utils.ErrorCalculator;
 import lombok.Getter;
@@ -16,14 +20,16 @@ public class NeuralNetwork {
     private Layer inputLayer;
     private List<Layer> layers;
     private Layer outputLayer;
+    private ActivationFunction activationFunction;
 
     private NeuralNetwork(NeuralNetworkBuilder builder) {
 
         setLayers(
                 builder.inputLayerSize,
                 builder.hiddenLayerSizes,
-                builder.outputLayerSize);
-
+                builder.outputLayerSize
+        );
+        activationFunction = builder.activationFunction;
         connectNetwork();
     }
 
@@ -82,7 +88,8 @@ public class NeuralNetwork {
         }
     }
 
-    public void train() {
+    public void train(Training training, DataSet dataSet) {
+        training.perform(this, dataSet.getTrainingSet());
     }
 
     public double[] predict(double[] data) {
@@ -102,18 +109,18 @@ public class NeuralNetwork {
 
     private void activateHiddenAndOutputLayers() {
 
-        Layer layer = getLayerAfter(inputLayer);
+        Layer layer = inputLayer;
 
         do {
+            layer = getLayerAfter(layer);
             for (Neuron neuron : layer.getNeurons()) {
                 neuron.activate();
             }
-            layer = getLayerAfter(layer);
 
         } while (hasLayerAfter(layer));
     }
 
-    private boolean hasLayerAfter(Layer layer) {
+    public boolean hasLayerAfter(Layer layer) {
         return layers.indexOf(layer) < layers.size() - 1;
     }
 
@@ -152,7 +159,6 @@ public class NeuralNetwork {
         double error = 0;
 
         for (Record record : dataSet) {
-
             error += calculateAverageErrorBetweenMaskAndNetworkDecision(record);
         }
         return error / dataSet.length;
@@ -177,6 +183,7 @@ public class NeuralNetwork {
         private int inputLayerSize;
         private int outputLayerSize;
         private List<Integer> hiddenLayerSizes;
+        private ActivationFunction activationFunction = new Bipolar(0.25);
 
         public NeuralNetworkBuilder() {
             hiddenLayerSizes = new ArrayList<>();
@@ -193,8 +200,12 @@ public class NeuralNetwork {
         }
 
         public NeuralNetworkBuilder hiddenLayer(int size) {
-
             hiddenLayerSizes.add(size);
+            return this;
+        }
+
+        public NeuralNetworkBuilder activationFunction(ActivationFunction activationFunction) {
+            this.activationFunction = activationFunction;
             return this;
         }
 

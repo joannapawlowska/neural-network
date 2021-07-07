@@ -1,6 +1,7 @@
 # Default ignored files
 /shelf/
-/workspace.xml
+/target/
+/.idea/
 # Datasource local storage ignored files
 /../../../../../../../../:\Users\Joanna\Documents\programming\Java\neural-network\.idea/dataSources/
 /dataSources.local.xml

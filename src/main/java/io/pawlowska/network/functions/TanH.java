@@ -20,4 +20,9 @@ public class TanH implements ActivationFunction {
 
         return y;
     }
+
+    public double calculateDerivative(double x) {
+
+        return (4 * ALPHA * Math.exp(-ALPHA * 2 * x) / Math.pow(Math.exp(-ALPHA * 2 * x) + 1, 2));
+    }
 }

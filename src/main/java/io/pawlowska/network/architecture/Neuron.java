@@ -2,7 +2,6 @@ package io.pawlowska.network.architecture;
 
 import io.pawlowska.network.exceptions.NoSuchConnectionException;
 import io.pawlowska.network.functions.ActivationFunction;
-import io.pawlowska.network.functions.ActivationFunctionDerivative;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,9 +17,9 @@ public class Neuron {
     private List<Connection> inputConnections;
     private List<Connection> outputConnections;
     private ActivationFunction activationFunction;
-    private ActivationFunctionDerivative activationFunctionDerivative;
 
-    public Neuron() {
+    public Neuron(ActivationFunction activationFunction) {
+        this.activationFunction = activationFunction;
         inputConnections = new ArrayList<>();
         outputConnections = new ArrayList<>();
     }
@@ -38,8 +37,8 @@ public class Neuron {
         signal = activationFunction.calculate(calculateInputSum());
     }
 
-    public void derivativeActivate() {
-        signal = activationFunctionDerivative.calculate(calculateInputSum());
+    public double derivativeActivate() {
+        return activationFunction.calculateDerivative(calculateInputSum());
     }
 
     public double calculateInputSum() {

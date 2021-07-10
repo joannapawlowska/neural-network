@@ -2,10 +2,9 @@ package io.pawlowska.network.architecture;
 
 import io.pawlowska.network.data.DataSet;
 import io.pawlowska.network.data.Record;
-import io.pawlowska.network.exceptions.MissingLayerException;
+import io.pawlowska.network.utils.NeuralNetworkValidator;
 import io.pawlowska.network.exceptions.NoSuchLayerException;
 import io.pawlowska.network.functions.ActivationFunction;
-import io.pawlowska.network.functions.Bipolar;
 import io.pawlowska.network.training.Training;
 import io.pawlowska.network.utils.DecisionComparator;
 import io.pawlowska.network.utils.ErrorCalculator;
@@ -21,6 +20,7 @@ public class NeuralNetwork {
     private List<Layer> layers;
     private Layer outputLayer;
     private ActivationFunction activationFunction;
+    private DataSet dataSet;
 
     private NeuralNetwork(NeuralNetworkBuilder builder) {
 
@@ -29,20 +29,23 @@ public class NeuralNetwork {
                 builder.hiddenLayerSizes,
                 builder.outputLayerSize
         );
+
         activationFunction = builder.activationFunction;
+        dataSet = builder.dataSet;
+
         connectNetwork();
     }
 
     private void setLayers(int inputLayerSize, List<Integer> hiddenLayerSizes, int outputLayerSize) {
 
-        inputLayer = new Layer(inputLayerSize);
-        outputLayer = new Layer(outputLayerSize);
+        inputLayer = new Layer(inputLayerSize, activationFunction);
+        outputLayer = new Layer(outputLayerSize, activationFunction);
         layers = new ArrayList<>();
 
         layers.add(inputLayer);
 
         for (Integer hiddenLayerSize : hiddenLayerSizes) {
-            layers.add(new Layer(hiddenLayerSize));
+            layers.add(new Layer(hiddenLayerSize, activationFunction));
         }
 
         layers.add(outputLayer);
@@ -88,7 +91,7 @@ public class NeuralNetwork {
         }
     }
 
-    public void train(Training training, DataSet dataSet) {
+    public void train(Training training) {
         training.perform(this, dataSet.getTrainingSet());
     }
 
@@ -180,10 +183,12 @@ public class NeuralNetwork {
 
     public static class NeuralNetworkBuilder {
 
-        private int inputLayerSize;
-        private int outputLayerSize;
-        private List<Integer> hiddenLayerSizes;
-        private ActivationFunction activationFunction = new Bipolar(0.25);
+        public int inputLayerSize;
+        public int outputLayerSize;
+        public List<Integer> hiddenLayerSizes;
+        public ActivationFunction activationFunction;
+        public DataSet dataSet;
+        public Training training;
 
         public NeuralNetworkBuilder() {
             hiddenLayerSizes = new ArrayList<>();
@@ -209,11 +214,18 @@ public class NeuralNetwork {
             return this;
         }
 
-        public NeuralNetwork build() {
+        public NeuralNetworkBuilder training(Training training){
+            this.training = training;
+            return this;
+        }
 
-            if (inputLayerSize == 0 || outputLayerSize == 0) {
-                throw new MissingLayerException("Neither input nor output layer size can be 0");
-            }
+        public NeuralNetworkBuilder dataSet(DataSet dataSet){
+            this.dataSet = dataSet;
+            return this;
+        }
+
+        public NeuralNetwork build() {
+            NeuralNetworkValidator.validate(this);
             return new NeuralNetwork(this);
         }
     }

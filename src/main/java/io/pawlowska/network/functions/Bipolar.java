@@ -20,4 +20,9 @@ public class Bipolar implements ActivationFunction {
 
         return y;
     }
+
+    public double calculateDerivative(double x) {
+
+        return (2 * ALPHA * Math.exp(-ALPHA * x)) / (Math.pow(1 + Math.exp(-ALPHA * x), 2));
+    }
 }

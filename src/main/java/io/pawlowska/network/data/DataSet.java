@@ -4,7 +4,6 @@ import io.pawlowska.network.exceptions.InvalidDataSetException;
 import io.pawlowska.network.utils.FileReaderAndWriter;
 import lombok.Getter;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.*;
 

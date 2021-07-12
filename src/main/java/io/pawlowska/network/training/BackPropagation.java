@@ -1,37 +1,48 @@
 package io.pawlowska.network.training;
 
-import io.pawlowska.network.architecture.*;
+import io.pawlowska.network.architecture.Connection;
+import io.pawlowska.network.architecture.Layer;
+import io.pawlowska.network.architecture.NeuralNetwork;
+import io.pawlowska.network.architecture.Neuron;
 import io.pawlowska.network.data.Record;
+import io.pawlowska.network.utils.FileReaderAndWriter;
 import lombok.Builder;
 
-public class BackPropagation implements Training {
 
-    @Builder.Default
-    private int epochs = 1000;
+public class BackPropagation extends Training {
 
-    @Builder.Default
-    private double ETA = 0.01;
-
-    private NeuralNetwork network;
-    private Record[] trainSet;
+    private int epochs;
+    private double ETA;
 
     @Builder
-    public BackPropagation(int epochs, double ETA) {
+    private BackPropagation(int epochs, double ETA) {
+        super();
         this.epochs = epochs;
         this.ETA = ETA;
     }
 
-    public void perform(NeuralNetwork network, Record[] trainSet) {
+    @Override
+    public void perform(NeuralNetwork network) {
 
-        while (epochs-- != 0) {
+        super.perform(network);
 
-            for (Record record : trainSet) {
+        while (epochs-- > 0) {
+
+            timer.start();
+
+            for (Record record : network.getDataSet().getTrainingSet()) {
 
                 derivativeActivateOutputLayer(record);
                 derivativeActivateHiddenLayers();
                 fixConnectionWeights();
             }
+
+            timer.stop();
+            collectTrainingResultOnTrainingSet();
         }
+
+        collectTrainingResultOnValidatingSet();
+        FileReaderAndWriter.writeToFile(trainingResultCollector.getResults(), network.getWritePath());
     }
 
     private void derivativeActivateOutputLayer(Record record) {
@@ -42,8 +53,8 @@ public class BackPropagation implements Training {
 
         for (Neuron neuron : network.getOutputLayer().getNeurons()) {
 
-            neuron.derivativeActivate();
-            neuron.setGradient((expectedDecision[i] - outputDecision[i++]) * neuron.getSignal());
+            double derivativeSignal = neuron.derivativeActivate();
+            neuron.setGradient((expectedDecision[i] - outputDecision[i++]) * derivativeSignal);
         }
     }
 

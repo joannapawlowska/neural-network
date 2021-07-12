@@ -16,15 +16,11 @@ public class NeuralNetworkValidator {
         }
 
         if (builder.dataSet.getMaskByCategory().size() != builder.outputLayerSize) {
-            throw new IllegalArgumentException("Number of type of feature categories must be equal output layer size");
+            throw new IllegalArgumentException("Output layer size must be equal number of data categories");
         }
 
         if (builder.dataSet.getFeatureNumber() != builder.inputLayerSize) {
-            throw new IllegalArgumentException("Number of feature columns must be equal input layer size");
-        }
-
-        if (builder.training == null) {
-            throw new NullPointerException("Training can not be null");
+            throw new IllegalArgumentException("Input layer size must be equal number of feature columns");
         }
 
         if (builder.activationFunction == null) {

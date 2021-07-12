@@ -1,13 +1,14 @@
-package io.pawlowska.network.training.heuristic;
+package io.pawlowska.network.training.particleswarmoptimization;
 
 import io.pawlowska.network.architecture.Layer;
 import io.pawlowska.network.architecture.NeuralNetwork;
 import io.pawlowska.network.architecture.Neuron;
-import io.pawlowska.network.data.Record;
 import io.pawlowska.network.training.Training;
+import io.pawlowska.network.utils.FileReaderAndWriter;
 import lombok.Builder;
 
-public class ParticleSwarmOptimization implements Training {
+
+public class ParticleSwarmOptimization extends Training {
 
     @Builder.Default
     private int epochs = 1000;
@@ -38,8 +39,6 @@ public class ParticleSwarmOptimization implements Training {
     @Builder.Default
     private double particleLocalAcceleration = 0.3;
 
-    private NeuralNetwork network;
-    private Record[] trainSet;
     private Swarm swarm;
 
     @Builder
@@ -47,20 +46,29 @@ public class ParticleSwarmOptimization implements Training {
                                      double particleMinRange, double particleMaxRange,
                                      double particleInertiaWeight, double particleGlobalAcceleration,
                                      double particleLocalAcceleration) {
+        super();
     }
 
-    public void perform(NeuralNetwork network, Record[] trainSet) {
+    @Override
+    public void perform(NeuralNetwork network) {
 
-        this.network = network;
-        this.trainSet = trainSet;
+        super.perform(network);
+
         this.swarm = new Swarm(swarmSize);
-
         fillSwarmWithParticles();
         setBestGlobalParticle();
 
         while (epochs-- > 0) {
-            trainSwarm(swarm);
+
+            timer.start();
+            trainSwarm();
+            timer.stop();
+
+            fixConnectionsWeights(swarm.getBestGlobalParticle().getPosition());
+            collectTrainingResultOnTrainingSet();
         }
+
+        FileReaderAndWriter.writeToFile(trainingResultCollector.getResults(), network.getWritePath());
     }
 
     private void fillSwarmWithParticles() {
@@ -113,7 +121,7 @@ public class ParticleSwarmOptimization implements Training {
         position = particle.getPosition();
         fixConnectionsWeights(position);
 
-        error = network.calculateError(trainSet);
+        error = network.calculateErrorForTrainingSet();
         particle.setBestLocalPositionValue(error);
     }
 
@@ -122,7 +130,7 @@ public class ParticleSwarmOptimization implements Training {
         swarm.fixBestGlobalParticle();
     }
 
-    private void trainSwarm(Swarm swarm) {
+    private void trainSwarm() {
 
         Particle bestGlobalParticle = swarm.getBestGlobalParticle();
 
@@ -143,7 +151,7 @@ public class ParticleSwarmOptimization implements Training {
 
         double[] vector = particle.getPosition();
         fixConnectionsWeights(vector);
-        double error = network.calculateError(trainSet);
+        double error = network.calculateErrorForTrainingSet();
 
         if (error < particle.getBestLocalPositionValue()) {
             fixParticleBestPosition(particle, error);

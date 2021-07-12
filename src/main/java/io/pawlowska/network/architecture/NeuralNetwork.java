@@ -10,6 +10,7 @@ import io.pawlowska.network.utils.DecisionComparator;
 import io.pawlowska.network.utils.ErrorCalculator;
 import lombok.Getter;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,17 +22,19 @@ public class NeuralNetwork {
     private Layer outputLayer;
     private ActivationFunction activationFunction;
     private DataSet dataSet;
+    private Path writePath;
 
     private NeuralNetwork(NeuralNetworkBuilder builder) {
+
+        activationFunction = builder.activationFunction;
+        dataSet = builder.dataSet;
+        writePath = builder.path;
 
         setLayers(
                 builder.inputLayerSize,
                 builder.hiddenLayerSizes,
                 builder.outputLayerSize
         );
-
-        activationFunction = builder.activationFunction;
-        dataSet = builder.dataSet;
 
         connectNetwork();
     }
@@ -92,7 +95,7 @@ public class NeuralNetwork {
     }
 
     public void train(Training training) {
-        training.perform(this, dataSet.getTrainingSet());
+        training.perform(this);
     }
 
     public double[] predict(double[] data) {
@@ -139,7 +142,15 @@ public class NeuralNetwork {
         return outputDecision;
     }
 
-    public double calculateAccuracy(Record[] dataSet) {
+    public double calculateAccuracyForTrainingSet() {
+        return calculateAccuracy(dataSet.getTrainingSet());
+    }
+
+    public double calculateAccuracyForValidatingSet(){
+        return calculateAccuracy(dataSet.getValidatingSet());
+    }
+
+    private double calculateAccuracy(Record[] dataSet) {
 
         double correctDecision = 0;
 
@@ -157,7 +168,15 @@ public class NeuralNetwork {
         return DecisionComparator.compare(expectedDecision, outputDecision);
     }
 
-    public double calculateError(Record[] dataSet) {
+    public double calculateErrorForTrainingSet() {
+        return calculateError(dataSet.getTrainingSet());
+    }
+
+    public double calculateErrorForValidatingSet() {
+        return calculateError(dataSet.getValidatingSet());
+    }
+
+    private double calculateError(Record[] dataSet) {
 
         double error = 0;
 
@@ -188,7 +207,7 @@ public class NeuralNetwork {
         public List<Integer> hiddenLayerSizes;
         public ActivationFunction activationFunction;
         public DataSet dataSet;
-        public Training training;
+        public Path path;
 
         public NeuralNetworkBuilder() {
             hiddenLayerSizes = new ArrayList<>();
@@ -214,13 +233,13 @@ public class NeuralNetwork {
             return this;
         }
 
-        public NeuralNetworkBuilder training(Training training){
-            this.training = training;
+        public NeuralNetworkBuilder dataSet(DataSet dataSet){
+            this.dataSet = dataSet;
             return this;
         }
 
-        public NeuralNetworkBuilder dataSet(DataSet dataSet){
-            this.dataSet = dataSet;
+        public NeuralNetworkBuilder writeToFile(Path path){
+            this.path = path;
             return this;
         }
 

@@ -1,4 +1,4 @@
-package io.pawlowska.network.training.heuristic;
+package io.pawlowska.network.training.particleswarmoptimization;
 
 import lombok.Getter;
 import lombok.Setter;

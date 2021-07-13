@@ -2,29 +2,25 @@ package io.pawlowska.network.training;
 
 import io.pawlowska.network.architecture.Connection;
 import io.pawlowska.network.architecture.Layer;
-import io.pawlowska.network.architecture.NeuralNetwork;
 import io.pawlowska.network.architecture.Neuron;
 import io.pawlowska.network.data.Record;
-import io.pawlowska.network.utils.FileReaderAndWriter;
 import lombok.Builder;
 
 
 public class BackPropagation extends Training {
 
     private int epochs;
-    private double ETA;
+    private double learningRate;
 
     @Builder
-    private BackPropagation(int epochs, double ETA) {
+    private BackPropagation(int epochs, double learningRate) {
         super();
         this.epochs = epochs;
-        this.ETA = ETA;
+        this.learningRate = learningRate;
     }
 
     @Override
-    public void perform(NeuralNetwork network) {
-
-        super.perform(network);
+    public void perform() {
 
         while (epochs-- > 0) {
 
@@ -40,9 +36,6 @@ public class BackPropagation extends Training {
             timer.stop();
             collectTrainingResultOnTrainingSet();
         }
-
-        collectTrainingResultOnValidatingSet();
-        FileReaderAndWriter.writeToFile(trainingResultCollector.getResults(), network.getWritePath());
     }
 
     private void derivativeActivateOutputLayer(Record record) {
@@ -79,20 +72,20 @@ public class BackPropagation extends Training {
                 gradient += connection.getNeuronTo().getGradient() * connection.getWeight();
             }
 
-            neuron.derivativeActivate();
-            neuron.setGradient(gradient * neuron.getSignal());
+            gradient *= neuron.derivativeActivate();
+            neuron.setGradient(gradient);
         }
     }
 
     private void fixConnectionWeights() {
 
-        Layer layer = network.getLayerBefore(network.getOutputLayer());
+        Layer layer = network.getOutputLayer();
 
-        while (network.isHiddenLayer(layer)) {
-
+        do {
             fixConnectionWeights(layer);
             layer = network.getLayerBefore(layer);
-        }
+
+        } while (network.isHiddenLayer(layer));
     }
 
     private void fixConnectionWeights(Layer layer) {
@@ -100,7 +93,7 @@ public class BackPropagation extends Training {
         for (Neuron neuron : layer.getNeurons()) {
 
             for (Connection connection : neuron.getInputConnections()) {
-                connection.setWeight(connection.getWeight() + ETA * neuron.getGradient() * connection.getNeuronFrom().getSignal());
+                connection.setWeight(connection.getWeight() + learningRate * neuron.getGradient() * connection.getNeuronFrom().getSignal());
             }
         }
     }

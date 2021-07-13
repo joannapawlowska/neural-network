@@ -2,7 +2,7 @@ package io.pawlowska.network.utils;
 
 public class DecisionComparator {
 
-    private final static double EPSILON = 0.000001d;
+    private final static double EPSILON = 0.00001;
 
     public static int compare(int[] expectedDecision, double[] outputDecision) {
 
@@ -10,7 +10,7 @@ public class DecisionComparator {
 
         for (int i = 0; i < outputDecision.length; i++) {
 
-            if (Math.abs(expectedDecision[i] - outputDecision[i]) < EPSILON) {
+            if (expectedDecision[i] == Math.round(outputDecision[i])) {
                 numberOfCorrectOutputs++;
             }
         }

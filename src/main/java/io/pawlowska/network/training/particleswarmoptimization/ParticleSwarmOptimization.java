@@ -4,7 +4,6 @@ import io.pawlowska.network.architecture.Layer;
 import io.pawlowska.network.architecture.NeuralNetwork;
 import io.pawlowska.network.architecture.Neuron;
 import io.pawlowska.network.training.Training;
-import io.pawlowska.network.utils.FileReaderAndWriter;
 import lombok.Builder;
 
 
@@ -47,16 +46,13 @@ public class ParticleSwarmOptimization extends Training {
                                      double particleInertiaWeight, double particleGlobalAcceleration,
                                      double particleLocalAcceleration) {
         super();
-    }
-
-    @Override
-    public void perform(NeuralNetwork network) {
-
-        super.perform(network);
-
         this.swarm = new Swarm(swarmSize);
         fillSwarmWithParticles();
         setBestGlobalParticle();
+    }
+
+    @Override
+    public void perform() {
 
         while (epochs-- > 0) {
 
@@ -67,8 +63,6 @@ public class ParticleSwarmOptimization extends Training {
             fixConnectionsWeights(swarm.getBestGlobalParticle().getPosition());
             collectTrainingResultOnTrainingSet();
         }
-
-        FileReaderAndWriter.writeToFile(trainingResultCollector.getResults(), network.getWritePath());
     }
 
     private void fillSwarmWithParticles() {

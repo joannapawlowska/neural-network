@@ -7,10 +7,14 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Getter
 @Setter
 public class Neuron {
+
+
+    private static final Random random = new Random();
 
     private double signal;
     private double gradient;
@@ -26,10 +30,14 @@ public class Neuron {
 
     public void connectWithNextLayer(Layer nextLayer) {
 
+        double min = -1;
+        double max = 1;
+
         for (Neuron neuron : nextLayer.getNeurons()) {
 
-            outputConnections.add(new Connection(this, neuron));
-            neuron.getInputConnections().add(new Connection(this, neuron));
+            Connection c = new Connection(this, neuron, min + (max - min) * random.nextDouble());
+            outputConnections.add(c);
+            neuron.getInputConnections().add(c);
         }
     }
 

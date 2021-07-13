@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public class Record {
 
-    double[] data;
-    int[] mask;
+    private double[] data;
+    private int[] mask;
 
     public Record(double[] data, int[] mask) {
         this.data = data;

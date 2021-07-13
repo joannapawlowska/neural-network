@@ -11,8 +11,9 @@ public class Connection {
     private Neuron neuronTo;
     private double weight;
 
-    public Connection(Neuron neuronFrom, Neuron neuronTo) {
+    public Connection(Neuron neuronFrom, Neuron neuronTo, double weight) {
         this.neuronFrom = neuronFrom;
         this.neuronTo = neuronTo;
+        this.weight = weight;
     }
 }

@@ -1,6 +1,7 @@
 package io.pawlowska.network.training;
 
 import io.pawlowska.network.architecture.NeuralNetwork;
+import io.pawlowska.network.utils.FileReaderAndWriter;
 import io.pawlowska.network.utils.Timer;
 import io.pawlowska.network.utils.TrainingResultCollector;
 
@@ -19,7 +20,12 @@ public abstract class Training {
         this.network = network;
         collectTrainingResultOnValidatingSet();
         collectResultsInfoLineForTrainingSet();
+        perform();
+        collectTrainingResultOnValidatingSet();
+        FileReaderAndWriter.writeToFile(trainingResultCollector.getResults(), network.getWritePath());
     }
+
+    protected abstract void perform();
 
     protected void collectTrainingResultOnValidatingSet(){
 

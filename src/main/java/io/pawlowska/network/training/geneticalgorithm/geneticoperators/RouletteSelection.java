@@ -1,19 +1,16 @@
-package io.pawlowska.network.training.evolutionaryalgorithm.geneticoperators;
+package io.pawlowska.network.training.geneticalgorithm.geneticoperators;
 
-import io.pawlowska.network.training.evolutionaryalgorithm.Individual;
-import io.pawlowska.network.training.evolutionaryalgorithm.Population;
+import io.pawlowska.network.training.geneticalgorithm.Individual;
+import io.pawlowska.network.training.geneticalgorithm.Population;
 import io.pawlowska.network.utils.WeightedCollection;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class RouletteSelection implements Selection {
+public class RouletteSelection extends Selection {
 
     private WeightedCollection<Individual> weightedIndividuals;
     private int selectionSize;
 
     @Override
-    public List<Individual> select(Population population) {
+    public Population select(Population population) {
 
         weightedIndividuals = new WeightedCollection<>();
         selectionSize = population.size() / 2;
@@ -34,14 +31,14 @@ public class RouletteSelection implements Selection {
                 .sum();
     }
 
-    private List<Individual> randomlySelectWeightedIndividuals() {
+    private Population randomlySelectWeightedIndividuals() {
 
-        List<Individual> selectedIndividuals = new ArrayList<>();
+        Population selectedPopulation = new Population();
 
         while (selectionSize-- > 0) {
-            selectedIndividuals.add(weightedIndividuals.next());
+            selectedPopulation.add(weightedIndividuals.next());
         }
 
-        return selectedIndividuals;
+        return selectedPopulation;
     }
 }

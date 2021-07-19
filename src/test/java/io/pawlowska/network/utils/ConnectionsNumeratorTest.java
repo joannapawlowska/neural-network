@@ -1,9 +1,7 @@
 package io.pawlowska.network.utils;
 
-import io.pawlowska.network.architecture.Layer;
-import io.pawlowska.network.architecture.NeuralNetwork;
-import io.pawlowska.network.architecture.NeuralNetworkBuilder;
-import io.pawlowska.network.architecture.Neuron;
+import io.pawlowska.network.network.*;
+import io.pawlowska.network.network.utils.ConnectionsNumerator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

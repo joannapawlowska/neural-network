@@ -1,15 +1,14 @@
-package io.pawlowska.network.architecture;
+package io.pawlowska.network.network;
 
 import lombok.Getter;
 import lombok.Setter;
 
-@Setter
 @Getter
 public class Connection {
 
-    private Neuron neuronFrom;
-    private Neuron neuronTo;
-    private double weight;
+    private final Neuron neuronFrom;
+    private final Neuron neuronTo;
+    @Setter private double weight;
 
     public Connection(Neuron neuronFrom, Neuron neuronTo, double weight) {
         this.neuronFrom = neuronFrom;

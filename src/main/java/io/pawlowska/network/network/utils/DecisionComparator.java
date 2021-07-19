@@ -1,8 +1,6 @@
-package io.pawlowska.network.utils;
+package io.pawlowska.network.network.utils;
 
 public class DecisionComparator {
-
-    private final static double EPSILON = 0.00001;
 
     public static int compare(int[] expectedDecision, double[] outputDecision) {
 

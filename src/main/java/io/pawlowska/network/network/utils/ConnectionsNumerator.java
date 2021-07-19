@@ -1,7 +1,7 @@
-package io.pawlowska.network.utils;
+package io.pawlowska.network.network.utils;
 
-import io.pawlowska.network.architecture.Layer;
-import io.pawlowska.network.architecture.Neuron;
+import io.pawlowska.network.network.Layer;
+import io.pawlowska.network.network.Neuron;
 import io.pawlowska.network.exceptions.MissingLayerException;
 
 import java.util.ArrayList;

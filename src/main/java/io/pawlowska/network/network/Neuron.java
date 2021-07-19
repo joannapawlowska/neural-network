@@ -1,4 +1,4 @@
-package io.pawlowska.network.architecture;
+package io.pawlowska.network.network;
 
 import io.pawlowska.network.exceptions.NoSuchConnectionException;
 import io.pawlowska.network.functions.ActivationFunction;
@@ -9,21 +9,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-@Getter
-@Setter
 public class Neuron {
 
-
     private static final Random random = new Random();
+    @Getter @Setter private double signal;
+    @Getter @Setter private double gradient;
+    @Getter private List<Connection> inputConnections;
+    @Getter private List<Connection> outputConnections;
+    @Setter private ActivationFunction activationFunction;
 
-    private double signal;
-    private double gradient;
-    private List<Connection> inputConnections;
-    private List<Connection> outputConnections;
-    private ActivationFunction activationFunction;
-
-    public Neuron(ActivationFunction activationFunction) {
-        this.activationFunction = activationFunction;
+    public Neuron() {
         inputConnections = new ArrayList<>();
         outputConnections = new ArrayList<>();
     }
@@ -33,7 +28,7 @@ public class Neuron {
         double min = -1;
         double max = 1;
 
-        for (Neuron neuron : nextLayer.getNeurons()) {
+        for (Neuron neuron : nextLayer) {
 
             Connection c = new Connection(this, neuron, min + (max - min) * random.nextDouble());
             outputConnections.add(c);
@@ -50,6 +45,7 @@ public class Neuron {
     }
 
     public double calculateInputSum() {
+
         double sum = 0;
 
         for (Connection connection : inputConnections) {

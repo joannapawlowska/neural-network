@@ -1,62 +1,60 @@
 package io.pawlowska.network.training;
 
-import io.pawlowska.network.architecture.NeuralNetwork;
-import io.pawlowska.network.utils.FileReaderAndWriter;
-import io.pawlowska.network.utils.Timer;
-import io.pawlowska.network.utils.TrainingResultCollector;
+import io.pawlowska.network.network.NeuralNetwork;
+import io.pawlowska.network.training.utils.FileReaderAndWriter;
+import io.pawlowska.network.training.utils.Timer;
+import io.pawlowska.network.training.utils.TrainingResultFormatter;
+import io.pawlowska.network.training.utils.TrainingResults;
+
+import java.nio.file.Path;
 
 public abstract class Training {
 
-    protected Timer timer;
-    protected TrainingResultCollector trainingResultCollector;
+    private final TrainingResultFormatter resultFormatter;
+    protected final Timer timer;
     protected NeuralNetwork network;
+    private Path writePath;
+    protected boolean pruned;
+    private int epochs;
 
-    protected Training(){
-        this.timer = new Timer();
-        this.trainingResultCollector = new TrainingResultCollector();
+    protected Training(TrainingBuilder<?> builder){
+
+        pruned = false;
+        network = builder.getNeuralNetwork();
+        writePath = builder.getWritePath();
+        epochs = builder.getEpochs();
+        timer = new Timer();
+        resultFormatter = new TrainingResultFormatter();
     }
 
-    public void perform(NeuralNetwork network){
-        this.network = network;
-        collectTrainingResultOnValidatingSet();
-        collectResultsInfoLineForTrainingSet();
-        perform();
-        collectTrainingResultOnValidatingSet();
-        FileReaderAndWriter.writeToFile(trainingResultCollector.getResults(), network.getWritePath());
+    public abstract void performOneEpochOfTraining();
+
+    public void perform() {
+
+        resultFormatter.addResultOnValidatingSet(calculateResultsValidatingSet());
+
+        while (epochs-- > 0) {
+
+            performOneEpochOfTraining();
+            resultFormatter.addResultOnTrainingSet(calculateResultsTrainingSet());
+        }
+
+        resultFormatter.addResultOnValidatingSet(calculateResultsValidatingSet());
+        FileReaderAndWriter.writeToFile(resultFormatter.format(), writePath);
     }
 
-    protected abstract void perform();
+    private TrainingResults calculateResultsTrainingSet() {
 
-    protected void collectTrainingResultOnValidatingSet(){
-
-        collectResultsInfoLineForValidatingSet();
-        double error = network.calculateErrorForValidatingSet();
-        double accuracy = network.calculateAccuracyForValidatingSet();
-
-        trainingResultCollector.addError(error);
-        trainingResultCollector.addAccuracy(accuracy);
-        trainingResultCollector.newLine();
-    }
-
-    protected void collectResultsInfoLineForValidatingSet(){
-        trainingResultCollector.addText("error,accuracy - validating set");
-        trainingResultCollector.newLine();
-    }
-
-    protected void collectResultsInfoLineForTrainingSet(){
-        trainingResultCollector.addText("error,accuracy,time(ms) - training set");
-        trainingResultCollector.newLine();
-    }
-
-    protected void collectTrainingResultOnTrainingSet(){
-
-        long time = timer.getTimeElapsed();
         double error = network.calculateErrorForTrainingSet();
         double accuracy = network.calculateAccuracyForTrainingSet();
+        long time = timer.getTimeElapsed();
+        return new TrainingResults(error, accuracy, time, pruned);
+    }
 
-        trainingResultCollector.addError(error);
-        trainingResultCollector.addAccuracy(accuracy);
-        trainingResultCollector.addTime(time);
-        trainingResultCollector.newLine();
+    private TrainingResults calculateResultsValidatingSet() {
+
+        double error = network.calculateErrorForValidatingSet();
+        double accuracy = network.calculateAccuracyForValidatingSet();
+        return new TrainingResults(error, accuracy);
     }
 }

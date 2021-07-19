@@ -2,8 +2,9 @@ package io.pawlowska.network.training.geneticalgorithm.geneticoperators;
 
 import io.pawlowska.network.training.geneticalgorithm.Individual;
 import io.pawlowska.network.training.geneticalgorithm.Population;
-import io.pawlowska.network.utils.Pair;
+import io.pawlowska.network.training.utils.Pair;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,8 +33,8 @@ public class TournamentSelection extends Selection {
 
     private Pair<Individual> randomlySelectPairFrom(Population population) {
 
+        Collections.shuffle(population);
         List<Individual> pair = population.stream()
-                .unordered()
                 .limit(2)
                 .collect(Collectors.toList());
 

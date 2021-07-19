@@ -2,7 +2,7 @@ package io.pawlowska.network.training.geneticalgorithm.geneticoperators;
 
 import io.pawlowska.network.training.geneticalgorithm.Individual;
 import io.pawlowska.network.training.geneticalgorithm.Population;
-import io.pawlowska.network.utils.WeightedCollection;
+import io.pawlowska.network.training.utils.WeightedCollection;
 
 public class RouletteSelection extends Selection {
 

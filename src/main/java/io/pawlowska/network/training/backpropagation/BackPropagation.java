@@ -1,41 +1,34 @@
-package io.pawlowska.network.training;
+package io.pawlowska.network.training.backpropagation;
 
-import io.pawlowska.network.architecture.Connection;
-import io.pawlowska.network.architecture.Layer;
-import io.pawlowska.network.architecture.Neuron;
+import io.pawlowska.network.network.Connection;
+import io.pawlowska.network.network.Layer;
+import io.pawlowska.network.network.Neuron;
 import io.pawlowska.network.data.Record;
-import lombok.Builder;
+import io.pawlowska.network.training.Training;
 
 
 public class BackPropagation extends Training {
 
-    private int epochs;
     private double learningRate;
 
-    @Builder
-    private BackPropagation(int epochs, double learningRate) {
-        super();
-        this.epochs = epochs;
-        this.learningRate = learningRate;
+    public BackPropagation(BackPropagationBuilder builder) {
+        super(builder);
+        this.learningRate = builder.getLearningRate();
     }
 
     @Override
-    public void perform() {
+    public void performOneEpochOfTraining() {
 
-        while (epochs-- > 0) {
+        timer.start();
 
-            timer.start();
+        for (Record record : network.getDataSet().getTrainingSet()) {
 
-            for (Record record : network.getDataSet().getTrainingSet()) {
-
-                derivativeActivateOutputLayer(record);
-                derivativeActivateHiddenLayers();
-                fixConnectionWeights();
-            }
-
-            timer.stop();
-            collectTrainingResultOnTrainingSet();
+            derivativeActivateOutputLayer(record);
+            derivativeActivateHiddenLayers();
+            fixConnectionWeights();
         }
+
+        timer.stop();
     }
 
     private void derivativeActivateOutputLayer(Record record) {
@@ -44,7 +37,7 @@ public class BackPropagation extends Training {
         int[] expectedDecision = record.getMask();
         double[] outputDecision = network.predict(record.getData());
 
-        for (Neuron neuron : network.getOutputLayer().getNeurons()) {
+        for (Neuron neuron : network.getOutputLayer()) {
 
             double derivativeSignal = neuron.derivativeActivate();
             neuron.setGradient((expectedDecision[i] - outputDecision[i++]) * derivativeSignal);
@@ -64,13 +57,12 @@ public class BackPropagation extends Training {
 
     private void activateHiddenLayer(Layer layer) {
 
-        for (Neuron neuron : layer.getNeurons()) {
+        for (Neuron neuron : layer) {
 
-            int gradient = 0;
-
-            for (Connection connection : neuron.getOutputConnections()) {
-                gradient += connection.getNeuronTo().getGradient() * connection.getWeight();
-            }
+            double gradient = neuron.getOutputConnections()
+                    .stream()
+                    .mapToDouble(c -> c.getNeuronTo().getGradient() * c.getWeight())
+                    .sum();
 
             gradient *= neuron.derivativeActivate();
             neuron.setGradient(gradient);
@@ -90,7 +82,7 @@ public class BackPropagation extends Training {
 
     private void fixConnectionWeights(Layer layer) {
 
-        for (Neuron neuron : layer.getNeurons()) {
+        for (Neuron neuron : layer) {
 
             for (Connection connection : neuron.getInputConnections()) {
                 connection.setWeight(connection.getWeight() + learningRate * neuron.getGradient() * connection.getNeuronFrom().getSignal());

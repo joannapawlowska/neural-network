@@ -3,26 +3,22 @@ package io.pawlowska.network.training.particleswarmoptimization;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-public class Swarm {
+import java.util.ArrayList;
 
-    @Setter
-    private Particle bestGlobalParticle;
-    private Particle [] particles;
+public class Swarm extends ArrayList<Particle> {
 
-    public Swarm(int swarmSize) {
-        particles = new Particle[swarmSize];
-    }
+    @Setter @Getter private Particle bestGlobalParticle;
 
     public void fixBestGlobalParticle() {
 
-        for(Particle particle : particles) {
-            if (isBetterThanBestGlobalParticle(particle))
+        for (Particle particle : this) {
+            if (isBetterThanBestGlobalParticle(particle)){
                 bestGlobalParticle = particle;
+            }
         }
     }
 
-    private boolean isBetterThanBestGlobalParticle(Particle particle){
-        return particle.getBestLocalPositionValue() < bestGlobalParticle.getBestLocalPositionValue();
+    private boolean isBetterThanBestGlobalParticle(Particle particle) {
+        return particle.compareTo(bestGlobalParticle) < 0;
     }
 }

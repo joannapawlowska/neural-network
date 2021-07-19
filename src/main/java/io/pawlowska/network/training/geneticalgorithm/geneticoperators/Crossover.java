@@ -2,8 +2,9 @@ package io.pawlowska.network.training.geneticalgorithm.geneticoperators;
 
 import io.pawlowska.network.training.geneticalgorithm.Individual;
 import io.pawlowska.network.training.geneticalgorithm.Population;
-import io.pawlowska.network.utils.Pair;
+import io.pawlowska.network.training.utils.Pair;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -43,8 +44,9 @@ public abstract class Crossover {
     }
 
     protected Pair<Individual> randomlySelectPairFrom(List<Individual> individuals) {
+
+        Collections.shuffle(individuals);
         List<Individual> pair = individuals.stream()
-                .unordered()
                 .limit(2)
                 .collect(Collectors.toList());
 

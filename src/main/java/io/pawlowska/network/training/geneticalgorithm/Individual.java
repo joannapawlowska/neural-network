@@ -1,8 +1,6 @@
-package io.pawlowska.network.training.evolutionaryalgorithm;
+package io.pawlowska.network.training.geneticalgorithm;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +12,10 @@ public class Individual implements Comparable<Individual> {
     @Getter private List<Double> genotype;
     @Getter @Setter private double assessment;
 
-    public Individual() {
+    public Individual(){
         genotype = new ArrayList<>();
     }
 
-    @Builder
     public Individual(int genotypeSize, double geneStartMinRange, double geneStartMaxRange) {
         randomlyGenerateGenotype(genotypeSize, geneStartMinRange, geneStartMaxRange);
     }

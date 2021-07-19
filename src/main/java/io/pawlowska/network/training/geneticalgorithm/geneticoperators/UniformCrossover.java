@@ -1,7 +1,7 @@
 package io.pawlowska.network.training.geneticalgorithm.geneticoperators;
 
 import io.pawlowska.network.training.geneticalgorithm.Individual;
-import io.pawlowska.network.utils.Pair;
+import io.pawlowska.network.training.utils.Pair;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package io.pawlowska.network.utils;
+package io.pawlowska.network.training.utils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,7 +12,7 @@ public class FileReaderAndWriter {
         try {
             Files.writeString(path, data);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
         }
     }
 

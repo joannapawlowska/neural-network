@@ -1,10 +1,7 @@
 package io.pawlowska.network.data;
 
-import io.pawlowska.network.exceptions.InvalidDataSetException;
-import io.pawlowska.network.utils.FileReaderAndWriter;
 import lombok.Getter;
 
-import java.nio.file.Path;
 import java.util.*;
 
 @Getter
@@ -16,14 +13,18 @@ public class DataSet {
     private Map<String, int[]> maskByCategory;
     private int featureNumber;
 
-    private DataSet(DataSetBuilder builder) {
+    public DataSet(DataSetBuilder builder) {
 
-        this.featureNumber = builder.features[0].length;
-        createMasksByCategory(builder.categories);
-        normalize(builder.features);
-        createDataSet(builder);
+        featureNumber = builder.getFeatures()[0].length;
+        createMasksByCategory(builder.getCategories());
+        normalize(builder.getFeatures());
+        createDataSet(builder.getCategories(), builder.getFeatures());
         shuffleDataSet();
-        splitToTrainingAndValidatingSet(builder.trainingDataRatioToTestData);
+        splitToTrainingAndValidatingSet(builder.getTrainingDataRatioToTestData());
+    }
+
+    public static DataSetBuilder builder() {
+        return new DataSetBuilder();
     }
 
     private void createMasksByCategory(String[] labels) {
@@ -89,10 +90,8 @@ public class DataSet {
         }
     }
 
-    private void createDataSet(DataSetBuilder builder) {
+    private void createDataSet(String[] labels, double[][] features) {
 
-        double[][] features = builder.features;
-        String[] labels = builder.categories;
         dataSet = new Record[features.length];
 
         for (int i = 0; i < features.length; i++) {
@@ -112,79 +111,5 @@ public class DataSet {
         int trainAmount = (int) (dataSet.length * trainingDataRatioToTestData);
         trainingSet = Arrays.copyOfRange(dataSet, 0, trainAmount);
         validatingSet = Arrays.copyOfRange(dataSet, trainAmount, dataSet.length);
-    }
-
-    public static DataSetBuilder builder() {
-        return new DataSetBuilder();
-    }
-
-    public static class DataSetBuilder {
-
-        private double[][] features;
-        private String[] categories;
-        private double trainingDataRatioToTestData = 0.7;
-        private Path path;
-
-        public DataSetBuilder readFromFile(Path path) {
-            this.path = path;
-            return this;
-        }
-
-        public DataSetBuilder trainingDataRatioToTestData(double trainingDataRatioToTestData) {
-            if (trainingDataRatioToTestData <= 0 || trainingDataRatioToTestData > 1) {
-                throw new IllegalArgumentException("Ratio must be from range (0, 1)");
-            }
-            this.trainingDataRatioToTestData = trainingDataRatioToTestData;
-            return this;
-        }
-
-        public DataSet build() {
-            createFeatureAndCategoriesTables();
-            return new DataSet(this);
-        }
-
-
-        private void createFeatureAndCategoriesTables() {
-
-            List<String> lines = FileReaderAndWriter.readFromFile(path);
-            String[] line = lines.get(0).split(",");
-
-            features = new double[lines.size()][line.length - 1];
-            categories = new String[lines.size()];
-
-            fillFeatureAndCategoriesTables(lines);
-        }
-
-        private void fillFeatureAndCategoriesTables(List<String> lines) {
-
-            String[] line;
-
-            for (int i = 0; i < lines.size(); i++) {
-
-                line = lines.get(i).split(",");
-
-                for (int j = 0; j < line.length; j++) {
-
-                    if (isCategory(line, j)) {
-                        categories[i] = line[j];
-                    } else {
-                        features[i][j] = parseFeature(line[j]);
-                    }
-                }
-            }
-        }
-
-        private boolean isCategory(String[] line, int i) {
-            return i == line.length - 1;
-        }
-
-        private double parseFeature(String value) {
-
-            try {
-                return Double.parseDouble(value);
-            } catch (NumberFormatException e) {
-                throw new InvalidDataSetException("Could not parse data: " + value);
-            }
-        }
     }
 }

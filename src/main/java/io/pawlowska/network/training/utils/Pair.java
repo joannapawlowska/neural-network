@@ -1,4 +1,4 @@
-package io.pawlowska.network.utils;
+package io.pawlowska.network.training.utils;
 
 public class Pair<T> {
 

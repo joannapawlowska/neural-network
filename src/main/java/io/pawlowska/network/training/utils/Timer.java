@@ -1,4 +1,4 @@
-package io.pawlowska.network.utils;
+package io.pawlowska.network.training.utils;
 
 import java.time.Duration;
 import java.time.Instant;

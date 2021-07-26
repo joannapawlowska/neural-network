@@ -2,9 +2,10 @@ package io.pawlowska.network.training.particleswarmoptimization;
 
 import io.pawlowska.network.training.Training;
 import io.pawlowska.network.training.TrainingBuilder;
+import lombok.AccessLevel;
 import lombok.Getter;
 
-@Getter
+@Getter(AccessLevel.PACKAGE)
 public class ParticleSwarmOptimizationBuilder extends TrainingBuilder<ParticleSwarmOptimizationBuilder> {
 
     private int epochs;

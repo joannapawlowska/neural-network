@@ -1,9 +1,9 @@
 package io.pawlowska.network.training.backpropagation;
 
+import io.pawlowska.network.data.Record;
 import io.pawlowska.network.network.Connection;
 import io.pawlowska.network.network.Layer;
 import io.pawlowska.network.network.Neuron;
-import io.pawlowska.network.data.Record;
 import io.pawlowska.network.training.Training;
 
 
@@ -73,11 +73,12 @@ public class BackPropagation extends Training {
 
         Layer layer = network.getOutputLayer();
 
-        do {
+        while (layer != network.getInputLayer()) {
+
             fixConnectionWeights(layer);
             layer = network.getLayerBefore(layer);
 
-        } while (network.isHiddenLayer(layer));
+        }
     }
 
     private void fixConnectionWeights(Layer layer) {

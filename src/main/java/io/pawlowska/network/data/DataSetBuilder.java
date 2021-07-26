@@ -2,18 +2,19 @@ package io.pawlowska.network.data;
 
 import io.pawlowska.network.exceptions.InvalidDataSetException;
 import io.pawlowska.network.training.utils.FileReaderAndWriter;
+import lombok.AccessLevel;
 import lombok.Getter;
 
 import java.nio.file.Path;
 import java.util.List;
 
-
+@Getter(AccessLevel.PACKAGE)
 public class DataSetBuilder {
 
-    @Getter private double[][] features;
-    @Getter private String[] categories;
-    @Getter private double trainingDataRatioToTestData;
-    @Getter private Path path;
+    private double[][] features;
+    private String[] categories;
+    private double trainingDataRatioToTestData;
+    private Path path;
 
 
     public DataSetBuilder readFromFile(Path path) {

@@ -8,7 +8,6 @@ import io.pawlowska.network.exceptions.MissingLayerException;
 import io.pawlowska.network.functions.ActivationFunction;
 import lombok.Getter;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,9 +19,8 @@ public class NeuralNetworkBuilder {
     private List<Layer> layers;
     private ActivationFunction activationFunction;
     private DataSet dataSet;
-    private Path writePath;
 
-    public NeuralNetworkBuilder(){
+    public NeuralNetworkBuilder() {
         layers = new ArrayList<>();
     }
 
@@ -48,13 +46,8 @@ public class NeuralNetworkBuilder {
         return this;
     }
 
-    public NeuralNetworkBuilder dataSet(DataSet dataSet){
+    public NeuralNetworkBuilder dataSet(DataSet dataSet) {
         this.dataSet = dataSet;
-        return this;
-    }
-
-    public NeuralNetworkBuilder writePath(Path writePath){
-        this.writePath = writePath;
         return this;
     }
 

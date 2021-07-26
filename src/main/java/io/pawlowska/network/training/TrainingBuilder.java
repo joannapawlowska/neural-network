@@ -1,16 +1,19 @@
 package io.pawlowska.network.training;
 
 import io.pawlowska.network.network.NeuralNetwork;
+import io.pawlowska.network.training.pruning.Pruning;
+import lombok.AccessLevel;
 import lombok.Getter;
 
 import java.nio.file.Path;
 
-@Getter
+@Getter(AccessLevel.PACKAGE)
 public abstract class TrainingBuilder<T extends TrainingBuilder<T>> {
 
     private NeuralNetwork neuralNetwork;
     private Path writePath;
     private int epochs;
+    private Pruning pruning;
 
     public abstract Training build();
 
@@ -31,13 +34,18 @@ public abstract class TrainingBuilder<T extends TrainingBuilder<T>> {
         return this.self();
     }
 
+    public T pruning(Pruning pruning){
+        this.pruning = pruning;
+        return this.self();
+    }
+
     protected void validate() {
         validateEpochs();
         validateWritePath();
         validateNeuralNetwork();
     }
 
-    private void validateEpochs() {
+    void validateEpochs() {
         if (epochs < 0) {
             throw new IllegalArgumentException("Epoch number can not be less than 0");
         }

@@ -2,64 +2,49 @@ package io.pawlowska.network.training.pruning;
 
 import io.pawlowska.network.network.Connection;
 import io.pawlowska.network.network.Layer;
+import io.pawlowska.network.network.NeuralNetwork;
 import io.pawlowska.network.network.Neuron;
-import io.pawlowska.network.training.HeuristicTraining;
-import io.pawlowska.network.training.Training;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
 
-public class Pruning extends Training {
+public class Pruning {
 
     private double removalThreshold;
     private int minLayerSize;
-    private Training training;
     private double beforePrunedNetworkError;
     private Layer layerToRemoveFrom;
     private Neuron neuronToRemove;
     private int neuronIndex;
+    @Getter private boolean pruned;
+    @Setter private NeuralNetwork network;
 
     public Pruning(PruningBuilder builder) {
-        super(builder);
         removalThreshold = builder.getRemovalThreshold();
         minLayerSize = builder.getMinLayerSize();
-        training = builder.getTraining();
     }
 
-    @Override
-    public void performOneEpochOfTraining() {
-
-        if (existNeuronAppropriateToPrune()) {
-            beforePrunedNetworkError = network.calculateErrorForTrainingSet();
-            prune();
-        }
-
-        performEpochOfTrainingChangingWeights();
-
-        if (shouldUndoPruning()) {
-            undoPruning();
-        }else if(pruned){
-            if(training instanceof HeuristicTraining){
-                adjustTrainingToNewNetworkArchitecture();
-            }
-        }
-    }
-
-    private boolean existNeuronAppropriateToPrune() {
+    public boolean existNeuronAppropriateToPrune() {
 
         layerToRemoveFrom = null;
         neuronToRemove = null;
         pruned = false;
         Layer layer = network.getLayerAfter(network.getInputLayer());
 
-        while (couldBePrunedFrom(layer)) {
-            findNeuronToPrune(layer);
+        while (network.isHiddenLayer(layer)) {
+
+            if (couldBePrunedFrom(layer)) {
+                findNeuronToPrune(layer);
+            }
+            layer = network.getLayerAfter(layer);
         }
 
         return isFoundNeuronToPrune();
     }
 
     private boolean couldBePrunedFrom(Layer layer) {
-        return network.isHiddenLayer(layer) && layer.size() > minLayerSize;
+        return layer.size() > minLayerSize;
     }
 
     private void findNeuronToPrune(Layer layer) {
@@ -76,7 +61,7 @@ public class Pruning extends Training {
     }
 
     private boolean couldBePruned(Neuron neuron) {
-        return neuron.getSignal() < removalThreshold;
+        return Math.abs(neuron.getSignal()) < removalThreshold;
     }
 
     private boolean isFoundNeuronToPrune() {
@@ -84,7 +69,7 @@ public class Pruning extends Training {
     }
 
     private boolean isMoreAppropriateToPrune(Neuron neuron) {
-        return neuron.getSignal() < neuronToRemove.getSignal();
+        return Math.abs(neuron.getSignal()) < Math.abs(neuronToRemove.getSignal());
     }
 
     private void setToBePruned(Neuron neuron, Layer layer) {
@@ -93,11 +78,16 @@ public class Pruning extends Training {
         neuronIndex = layer.indexOf(neuron);
     }
 
-    private void prune() {
+    public void prune() {
 
+        calculateBeforePrunedNetworkError();
         disconnectNeuron();
         layerToRemoveFrom.remove(neuronToRemove);
         pruned = true;
+    }
+
+    private void calculateBeforePrunedNetworkError() {
+        beforePrunedNetworkError = network.calculateErrorForTrainingSet();
     }
 
     private void disconnectNeuron() {
@@ -111,25 +101,19 @@ public class Pruning extends Training {
         }
     }
 
-    private void performEpochOfTrainingChangingWeights(){
-        timer.start();
-        training.performOneEpochOfTraining();
-        timer.stop();
-    }
 
-    private boolean shouldUndoPruning() {
+    public boolean shouldUndoPruning() {
         return pruned && beforePrunedNetworkError < network.calculateErrorForTrainingSet();
     }
 
-    private void undoPruning() {
+    public void undoPruning() {
 
         pruned = false;
-        layerToRemoveFrom.add(neuronIndex - 1, neuronToRemove);
+        layerToRemoveFrom.add(neuronIndex, neuronToRemove);
         connectNeuron();
-        performEpochOfTrainingChangingWeights();
     }
 
-    private void connectNeuron(){
+    private void connectNeuron() {
 
         for (Connection c : neuronToRemove.getInputConnections()) {
             c.getNeuronFrom().getOutputConnections().add(c);
@@ -140,9 +124,7 @@ public class Pruning extends Training {
         }
     }
 
-    private void adjustTrainingToNewNetworkArchitecture(){
-
-        List<Integer> toRemove = network.getNeuronConnectionsNumbers(neuronToRemove);
-        ((HeuristicTraining) training).changeDimensionOfSolutions(toRemove);
+    public List<Integer> getRemovedNeuronConnectionNumbers() {
+        return network.getNeuronConnectionsNumbers(neuronToRemove);
     }
 }

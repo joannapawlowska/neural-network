@@ -5,9 +5,10 @@ import io.pawlowska.network.training.geneticalgorithm.geneticoperators.Crossover
 import io.pawlowska.network.training.geneticalgorithm.geneticoperators.Mutation;
 import io.pawlowska.network.training.geneticalgorithm.geneticoperators.Selection;
 import io.pawlowska.network.training.geneticalgorithm.geneticoperators.Succession;
+import lombok.AccessLevel;
 import lombok.Getter;
 
-@Getter
+@Getter(AccessLevel.PACKAGE)
 public class GeneticAlgorithmBuilder extends TrainingBuilder<GeneticAlgorithmBuilder> {
 
     private int populationSize;

@@ -25,4 +25,8 @@ public class Bipolar implements ActivationFunction {
 
         return (2 * ALPHA * Math.exp(-ALPHA * x)) / (Math.pow(1 + Math.exp(-ALPHA * x), 2));
     }
+
+    public ActivationFunction copy(){
+        return new Bipolar(ALPHA);
+    }
 }

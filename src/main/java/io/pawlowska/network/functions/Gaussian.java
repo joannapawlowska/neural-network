@@ -24,4 +24,8 @@ public class Gaussian implements ActivationFunction {
 
         return -2 * ALPHA * x * Math.exp(-ALPHA * ALPHA * x * x);
     }
+
+    public ActivationFunction copy(){
+        return new Gaussian(ALPHA);
+    }
 }

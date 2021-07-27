@@ -25,4 +25,8 @@ public class Unipolar implements ActivationFunction{
 
         return (ALPHA * Math.exp(-ALPHA * x)) / ((1 + Math.exp(-ALPHA * x)) * (1 + Math.exp(-ALPHA * x)));
     }
+
+    public ActivationFunction copy(){
+        return new Unipolar(ALPHA);
+    }
 }

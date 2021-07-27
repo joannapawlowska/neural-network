@@ -25,4 +25,8 @@ public class TanH implements ActivationFunction {
 
         return (4 * ALPHA * Math.exp(-ALPHA * 2 * x) / Math.pow(Math.exp(-ALPHA * 2 * x) + 1, 2));
     }
+
+    public ActivationFunction copy(){
+        return new TanH(ALPHA);
+    }
 }

@@ -32,12 +32,23 @@ public class NeuralNetworkBuilder {
 
     public NeuralNetworkBuilder outputLayer(Layer outputLayer) {
         this.outputLayer = outputLayer;
-        this.layers.add(outputLayer);
+        layers.add(outputLayer);
         return this;
     }
 
     public NeuralNetworkBuilder hiddenLayer(Layer hiddenLayer) {
-        layers.add(hiddenLayer);
+
+        int index;
+
+        if(layers.size() == 0){
+            index = 0;
+        }else if(outputLayer != null){
+            index = layers.size() - 1;
+        }else{
+            index = layers.size();
+        }
+
+        layers.add(index, hiddenLayer);
         return this;
     }
 

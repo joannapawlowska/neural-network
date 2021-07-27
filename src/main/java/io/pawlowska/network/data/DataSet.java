@@ -1,26 +1,29 @@
 package io.pawlowska.network.data;
 
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.*;
 
-@Getter
+@Setter(AccessLevel.PACKAGE)
 public class DataSet {
 
-    private Record[] dataSet;
-    private Record[] trainingSet;
-    private Record[] validatingSet;
-    private Map<String, int[]> maskByCategory;
-    private int featureNumber;
+    @Getter private Record[] trainingSet;
+    @Getter private Record[] validatingSet;
+    @Getter private Map<String, int[]> maskByCategory;
+    @Getter private int featureNumber;
+
+    DataSet(){}
 
     public DataSet(DataSetBuilder builder) {
 
         featureNumber = builder.getFeatures()[0].length;
         createMasksByCategory(builder.getCategories());
         normalize(builder.getFeatures());
-        createDataSet(builder.getCategories(), builder.getFeatures());
-        shuffleDataSet();
-        splitToTrainingAndValidatingSet(builder.getTrainingDataRatioToTestData());
+        Record [] data = createData(builder.getCategories(), builder.getFeatures());
+        shuffleDataSet(data);
+        splitToTrainingAndValidatingSet(builder.getTrainingDataRatioToTestData(), data);
     }
 
     public static DataSetBuilder builder() {
@@ -90,26 +93,28 @@ public class DataSet {
         }
     }
 
-    private void createDataSet(String[] labels, double[][] features) {
+    private Record [] createData(String[] labels, double[][] features) {
 
-        dataSet = new Record[features.length];
+        Record[] data = new Record[features.length];
 
         for (int i = 0; i < features.length; i++) {
-            dataSet[i] = new Record(features[i], maskByCategory.get(labels[i]));
+            data[i] = new Record(features[i], maskByCategory.get(labels[i]));
         }
+
+        return data;
     }
 
-    private void shuffleDataSet() {
+    private void shuffleDataSet(Record [] data) {
 
-        List<Record> records = Arrays.asList(dataSet);
+        List<Record> records = Arrays.asList(data);
         Collections.shuffle(records);
-        records.toArray(dataSet);
+        records.toArray(data);
     }
 
-    private void splitToTrainingAndValidatingSet(double trainingDataRatioToTestData) {
+    private void splitToTrainingAndValidatingSet(double trainingDataRatioToTestData, Record [] data) {
 
-        int trainAmount = (int) (dataSet.length * trainingDataRatioToTestData);
-        trainingSet = Arrays.copyOfRange(dataSet, 0, trainAmount);
-        validatingSet = Arrays.copyOfRange(dataSet, trainAmount, dataSet.length);
+        int trainAmount = (int) (data.length * trainingDataRatioToTestData);
+        trainingSet = Arrays.copyOfRange(data, 0, trainAmount);
+        validatingSet = Arrays.copyOfRange(data, trainAmount, data.length);
     }
 }

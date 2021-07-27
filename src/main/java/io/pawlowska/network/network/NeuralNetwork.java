@@ -36,10 +36,6 @@ public class NeuralNetwork {
         connectNetwork();
     }
 
-    public static NeuralNetworkBuilder builder() {
-        return new NeuralNetworkBuilder();
-    }
-
     private void enableNeuronActivation(ActivationFunction function) {
 
         layers.stream()

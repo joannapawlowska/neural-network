@@ -6,6 +6,9 @@ import io.pawlowska.network.training.utils.FileReaderAndWriter;
 import io.pawlowska.network.training.utils.Timer;
 import io.pawlowska.network.training.utils.TrainingResultFormatter;
 import io.pawlowska.network.training.utils.TrainingResults;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.nio.file.Path;
 
@@ -13,8 +16,8 @@ public abstract class Training {
 
     private final TrainingResultFormatter resultFormatter;
     protected final Timer timer;
-    protected NeuralNetwork network;
-    private Path writePath;
+    @Setter(AccessLevel.PROTECTED) @Getter(AccessLevel.PROTECTED) protected NeuralNetwork network;
+    @Getter(AccessLevel.PROTECTED) private Path writePath;
     private Pruning pruning;
     private int epochs;
 

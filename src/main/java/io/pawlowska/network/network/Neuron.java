@@ -2,6 +2,7 @@ package io.pawlowska.network.network;
 
 import io.pawlowska.network.exceptions.NoSuchConnectionException;
 import io.pawlowska.network.functions.ActivationFunction;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +17,7 @@ public class Neuron {
     @Getter @Setter private double gradient;
     @Getter private List<Connection> inputConnections;
     @Getter private List<Connection> outputConnections;
-    @Setter private ActivationFunction activationFunction;
+    @Setter @Getter(AccessLevel.PACKAGE) private ActivationFunction activationFunction;
 
     public Neuron() {
         inputConnections = new ArrayList<>();
